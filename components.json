@@ -1,0 +1,5 @@
+{
+  "componentsPath": "src/ui",
+  "buildable": true,
+  "generateAs": "library"
+}

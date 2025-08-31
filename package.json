@@ -11,6 +11,7 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/cdk": "^18.0.0",
     "@angular/common": "^19.2.0",
     "@angular/compiler": "^19.2.0",
     "@angular/core": "^19.2.0",
@@ -18,9 +19,13 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "@spartan-ng/brain": "^0.0.1-alpha.506",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "rxjs": "~7.8.0",
     "single-spa": ">=4.0.0",
     "single-spa-angular": "^9.2.0",
+    "tailwindcss-animate": "^1.0.7",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
@@ -29,14 +34,20 @@
     "@angular-devkit/build-angular": "^19.2.11",
     "@angular/cli": "^19.2.11",
     "@angular/compiler-cli": "^19.2.0",
+    "@spartan-ng/cli": "^0.0.1-alpha.506",
     "@types/jasmine": "~5.1.0",
+    "autoprefixer": "^10.4.21",
+    "css-loader": "^7.1.2",
     "jasmine-core": "~5.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "style-loader": "^3.3.1",
+    "postcss-loader": "^8.1.1",
+    "style-loader": "^3.3.4",
+    "tailwind-merge": "^2.2.0",
+    "tailwindcss": "^3.4.17",
     "typescript": "~5.7.2"
   }
 }
