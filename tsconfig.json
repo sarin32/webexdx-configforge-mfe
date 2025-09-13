@@ -17,7 +17,7 @@
     "module": "ES2022",
     "paths": {
       "@spartan-ng/helm/button": [
-        "./libs/src/ui/ui-button-helm/src/index.ts"
+        "./libs/ui/ui-button-helm/src/index.ts"
       ]
     }
   },

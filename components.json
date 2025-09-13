@@ -1,5 +1,5 @@
 {
-  "componentsPath": "src/ui",
+  "componentsPath": "ui",
   "buildable": true,
   "generateAs": "library"
 }
