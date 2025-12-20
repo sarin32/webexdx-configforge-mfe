@@ -1,18 +1,26 @@
 import type {
+  HttpErrorResponse,
   HttpHandlerFn,
   HttpInterceptorFn,
   HttpRequest,
 } from '@angular/common/http';
+import { catchError, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
 ) => {
-  // Inject the current `AuthService` and use it to get an authentication token:
-  const authToken = localStorage.getItem('auth_token');
-  // Clone the request to add the authentication header.
+  // No token injection needed for cookies
   const newReq = req.clone({
-    headers: req.headers.append('Authorization', authToken || ''),
+    withCredentials: true,
   });
-  return next(newReq);
+  return next(newReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        window.location.href = `${environment.authAppUrl}/login`;
+      }
+      return throwError(() => error);
+    })
+  );
 };

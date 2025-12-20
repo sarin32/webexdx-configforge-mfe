@@ -1,0 +1,177 @@
+<div class="space-y-6">
+    @if (loading()) {
+    <div class="text-center font-medium">Loading...</div>
+    }
+
+    @if (error()) {
+    <div class="p-4 bg-red-100 text-red-700 rounded-md">{{ error() }}</div>
+    }
+
+    <!-- Project Detail View -->
+    @if (selectedProject() && !loading()) {
+    <div class="animate-in fade-in slide-in-from-right-4 duration-300">
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center space-x-4">
+                <button hlmBtn variant="outline" size="sm" (click)="backToList()">
+                    <ng-icon hlm name="lucideChevronLeft" class="mr-1 h-4 w-4" />
+                    All Projects
+                </button>
+
+                @if (!isEditingTitle()) {
+                <div class="flex items-center group">
+                    <h1 class="text-3xl font-bold">{{ selectedProject()?.name }}</h1>
+                    <button (click)="startEditTitle()"
+                        class="ml-2 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted rounded-md text-muted-foreground hover:text-primary"
+                        title="Rename project">
+                        <ng-icon hlm name="lucideEdit" class="h-4 w-4" />
+                    </button>
+                </div>
+                } @else {
+                <div class="flex items-center space-x-2 animate-in slide-in-from-left-2 duration-200">
+                    <input hlmInput [(ngModel)]="editingTitle" class="h-10 text-xl font-bold w-64" autofocus
+                        (keyup.enter)="saveTitleEdit()" (keyup.esc)="cancelEditTitle()">
+                    <button hlmBtn size="sm" (click)="saveTitleEdit()">Save</button>
+                    <button hlmBtn variant="ghost" size="sm" (click)="cancelEditTitle()">Cancel</button>
+                </div>
+                }
+            </div>
+            <div class="flex space-x-2">
+                <button hlmBtn variant="outline" size="sm" class="text-red-500 hover:text-red-700 hover:bg-red-50"
+                    (click)="deleteProject()">
+                    <ng-icon hlm name="lucideTrash2" class="mr-2 h-4 w-4" />
+                    Delete Project
+                </button>
+                <div class="w-px h-8 bg-muted mx-1"></div>
+                <button hlmBtn variant="outline" size="sm" (click)="toggleAddKey()">
+                    <ng-icon hlm [name]="showAddKey() ? 'lucideX' : 'lucidePlus'" class="mr-2 h-4 w-4" />
+                    {{ showAddKey() ? 'Cancel' : 'Add Parameter' }}
+                </button>
+                <button hlmBtn variant="default" size="sm"
+                    (click)="showCreateEnvironment.set(!showCreateEnvironment())">
+                    <ng-icon hlm [name]="showCreateEnvironment() ? 'lucideX' : 'lucidePlus'" class="mr-2 h-4 w-4" />
+                    {{ showCreateEnvironment() ? 'Cancel' : 'Add Environment' }}
+                </button>
+            </div>
+        </div>
+
+        <!-- Create Environment Form -->
+        @if (showCreateEnvironment()) {
+        <div
+            class="mb-10 p-6 border rounded-xl bg-card flex flex-col md:flex-row items-end gap-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-200 border-primary/20">
+            <div class="flex-1 w-full space-y-1">
+                <label class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Environment
+                    Name</label>
+                <input hlmInput placeholder="e.g., Staging" [(ngModel)]="newEnvironmentName" class="w-full"
+                    (keyup.enter)="createEnvironment()">
+            </div>
+            <button hlmBtn class="w-full md:w-auto h-11 px-8" (click)="createEnvironment()">Save Environment</button>
+        </div>
+        }
+
+        <!-- Add Key Form (Optional row addition) -->
+        @if (showAddKey()) {
+        <div
+            class="mb-10 p-5 border rounded-xl bg-muted/20 flex flex-col md:flex-row items-end gap-3 animate-in fade-in slide-in-from-top-4 duration-200 border-dashed">
+            <div class="flex-1 w-full space-y-1">
+                <label class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">New Parameter
+                    Key</label>
+                <input hlmInput placeholder="e.g., TIMEOUT_MS" [(ngModel)]="newKeyName" class="w-full bg-background"
+                    autofocus>
+            </div>
+            <p class="text-xs text-muted-foreground pb-3 hidden md:block">After adding, set values in the matrix cells
+                below.</p>
+            <button hlmBtn size="sm" class="h-10 px-6" (click)="addKeyRow()">Initialize Key</button>
+        </div>
+        }
+
+        <!-- Matrix Table -->
+        <div class="border rounded-xl bg-card shadow-sm border-muted overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left border-collapse">
+                    <thead>
+                        <tr class="bg-muted/50 border-b border-muted">
+                            <th scope="col"
+                                class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider sticky left-0 z-10 bg-muted/50 border-r border-muted w-64 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
+                                Key / Environments
+                            </th>
+                            @for (env of selectedProject()?.environments; track env.id) {
+                            <th scope="col"
+                                class="px-6 py-4 font-bold text-foreground text-center min-w-[200px] border-r border-muted last:border-r-0">
+                                <div class="flex items-center justify-center space-x-2">
+                                    <span>{{ env.environmentName }}</span>
+                                </div>
+                            </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-muted">
+                        <!-- Data Rows -->
+                        @for (key of allKeys(); track key) {
+                        <tr class="hover:bg-muted/30 transition-colors group">
+                            <th scope="row"
+                                class="px-6 py-4 font-mono font-bold text-primary sticky left-0 z-10 bg-card group-hover:bg-muted/30 border-r border-muted shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
+                                {{ key }}
+                            </th>
+
+                            @for (env of selectedProject()?.environments; track env.id) {
+                            <td class="px-6 py-4 text-center border-r border-muted last:border-r-0 relative">
+                                <div class="flex flex-col items-center justify-center min-h-[2.5rem]">
+
+                                    <!-- View Mode -->
+                                    @if (editingCell()?.key !== key || editingCell()?.envId !== env.id) {
+                                    <div (click)="startEditCell(key, env.id, matrix()[key][env.id])"
+                                        class="cursor-pointer hover:underline decoration-dashed transition-all p-1 rounded-md hover:bg-muted w-full">
+                                        @if (matrix()[key][env.id]) {
+                                        <span class="font-medium text-foreground">{{
+                                            matrix()[key][env.id].value }}</span>
+                                        } @else {
+                                        <span class="text-muted-foreground/40 italic text-xs">- Not Set -</span>
+                                        }
+                                    </div>
+
+                                    <!-- Delete small button for defined variables -->
+                                    @if (matrix()[key][env.id]) {
+                                    <button (click)="deleteVariable(matrix()[key][env.id].id); $event.stopPropagation()"
+                                        class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-red-300 hover:text-red-500 transition-opacity p-0.5"
+                                        title="Remove value">
+                                        <ng-icon hlm name="lucideX" class="h-3 w-3" />
+                                    </button>
+                                    }
+                                    } @else {
+                                    <!-- Edit Mode -->
+                                    <div class="w-full flex items-center space-x-1 animate-in zoom-in-95 duration-150">
+                                        <input hlmInput size="sm" [(ngModel)]="editingValue"
+                                            class="flex-1 h-8 text-xs text-center" autofocus (keyup.enter)="saveCell()"
+                                            (keyup.esc)="cancelEditCell()">
+                                        <div class="flex flex-col space-y-0.5">
+                                            <button (click)="saveCell()"
+                                                class="text-green-600 hover:text-green-700 p-0.5">
+                                                <ng-icon hlm name="lucideCheck" class="h-3.5 w-3.5" />
+                                            </button>
+                                            <button (click)="cancelEditCell()"
+                                                class="text-muted-foreground hover:text-foreground p-0.5">
+                                                <ng-icon hlm name="lucideX" class="h-3.5 w-3.5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
+                            </td>
+                            }
+                        </tr>
+                        } @empty {
+                        <!-- Empty State -->
+                        <tr>
+                            <td [attr.colspan]="(selectedProject()?.environments?.length || 0) + 1"
+                                class="px-6 py-12 text-center text-muted-foreground italic">
+                                No parameters defined. Use "Add Parameter" to start.
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+</div>

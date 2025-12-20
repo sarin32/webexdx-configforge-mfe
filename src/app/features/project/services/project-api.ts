@@ -1,29 +1,58 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import type { Observable } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
+
+export interface ProjectData {
+  projectId: string; // Backend uses projectId
+  name: string;
+  createdAt: Date;
+  environmentCount: number;
+}
+
+export interface DetailedVariableData {
+  id: string;
+  key: string;
+  value: string;
+  isOverride: boolean;
+}
+
+export interface EnvironmentData {
+  id: string;
+  environmentName: string;
+  variables: DetailedVariableData[];
+}
+
+export interface GetProjectDataInDetailResult {
+  id: string;
+  name: string;
+  createdAt: Date;
+  environments: EnvironmentData[];
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProjectService {
-  private apiUrl = `${environment.serverBaseUrl}/project`;
+  private http = inject(HttpClient);
+  private baseUrl = `${environment.serverBaseUrl}/project`;
 
-  constructor(private http: HttpClient) { }
-
-  createProject(projectData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/create`, projectData);
+  createProject(projectData: { name: string }) {
+    return this.http.post<{ projectId: string }>(`${this.baseUrl}`, projectData);
   }
 
-  updateProject(projectData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/edit`, projectData);
+  getProjectList() {
+    return this.http.get<ProjectData[]>(this.baseUrl);
   }
 
-  getProjectList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/getList`, {});
+  getProjectDetail(projectId: string) {
+    return this.http.get<GetProjectDataInDetailResult>(`${this.baseUrl}/${projectId}`);
   }
 
-  getProjectDetails(projectId: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/getDataInDetail`, { projectId });
+  updateProject(projectId: string, data: { name: string }) {
+    return this.http.put<void>(`${this.baseUrl}/${projectId}`, data);
+  }
+
+  deleteProject(projectId: string) {
+    return this.http.delete<void>(`${this.baseUrl}/${projectId}`);
   }
 }
