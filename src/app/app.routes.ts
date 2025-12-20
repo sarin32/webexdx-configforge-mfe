@@ -1,6 +1,4 @@
-import { Routes } from '@angular/router';
-import { ProjectListComponent } from './project-list/project-list.component';
+import type { Routes } from '@angular/router';
+import { Project } from './features/project/project';
 
-export const routes: Routes = [
-    {path: '', component: ProjectListComponent}
-];
+export const routes: Routes = [{ path: '', component: Project }];
