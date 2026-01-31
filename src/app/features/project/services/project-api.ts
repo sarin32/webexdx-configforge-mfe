@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 
 export interface ProjectData {
@@ -37,7 +37,10 @@ export class ProjectService {
   private baseUrl = `${environment.serverBaseUrl}/project`;
 
   createProject(projectData: { name: string }) {
-    return this.http.post<{ projectId: string }>(`${this.baseUrl}`, projectData);
+    return this.http.post<{ projectId: string }>(
+      `${this.baseUrl}`,
+      projectData,
+    );
   }
 
   getProjectList() {
@@ -45,7 +48,9 @@ export class ProjectService {
   }
 
   getProjectDetail(projectId: string) {
-    return this.http.get<GetProjectDataInDetailResult>(`${this.baseUrl}/${projectId}`);
+    return this.http.get<GetProjectDataInDetailResult>(
+      `${this.baseUrl}/${projectId}`,
+    );
   }
 
   updateProject(projectId: string, data: { name: string }) {

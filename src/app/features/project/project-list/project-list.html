@@ -1,81 +1,95 @@
 <div class="space-y-6">
-    @if (loading()) {
-    <div class="text-center font-medium">Loading...</div>
-    }
-
-
-    @if (!loading()) {
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Projects</h1>
-        <button hlmBtn (click)="showCreateProject.set(!showCreateProject())">
-            <ng-icon hlm name="lucidePlus" class="mr-2 h-4 w-4" />
-            {{ showCreateProject() ? 'Cancel' : 'Create Project' }}
-        </button>
+  @if (loading()) {<div class="text-center font-medium">Loading...</div>} @if (!loading()) {
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">Projects</h1>
+    <button hlmBtn (click)="showCreateProject.set(!showCreateProject())">
+      <ng-icon hlm name="lucidePlus" class="mr-2 h-4 w-4"/>
+      {{ showCreateProject() ? 'Cancel' : 'Create Project' }}
+    </button>
+  </div>
+  <!-- Create Project Form -->
+  @if (showCreateProject()) {
+  <div
+    class="mb-8 p-6 border rounded-lg bg-card flex items-end space-x-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-200"
+  >
+    <div class="flex-1 space-y-1">
+      <label class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        Project Name
+      </label>
+      <input hlmInput placeholder="e.g., Marketing API" [(ngModel)]="newProjectName" class="w-full">
     </div>
+    <button hlmBtn (click)="createProject()">Save Project</button>
+  </div>
+  }
 
-    <!-- Create Project Form -->
-    @if (showCreateProject()) {
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @for (project of projects(); track project.projectId) {
     <div
-        class="mb-8 p-6 border rounded-lg bg-card flex items-end space-x-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-200">
-        <div class="flex-1 space-y-1">
-            <label class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Project Name</label>
-            <input hlmInput placeholder="e.g., Marketing API" [(ngModel)]="newProjectName" class="w-full">
+      hlmCard
+      class="flex flex-col cursor-pointer hover:border-primary transition-all hover:shadow-md group relative"
+      (click)="viewProjectDetail(project.projectId)"
+    >
+      <div hlmCardHeader class="flex-1">
+        @if (editingProjectId() !== project.projectId) {
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 hlmCardTitle class="group-hover:text-primary transition-colors pr-8">
+              {{ project.name }}
+            </h3>
+            <p hlmCardDescription>Created: {{ project.createdAt | date }}</p>
+          </div>
+          <div
+            class="flex space-x-1 absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <button
+              (click)="startEdit(project); $event.stopPropagation()"
+              class="p-1.5 hover:bg-muted rounded-md text-muted-foreground hover:text-primary transition-colors"
+              title="Edit name"
+            >
+              <ng-icon hlm name="lucideEdit" class="h-4 w-4"/>
+            </button>
+
+            <app-delete-project-modal
+              [projectId]="project.projectId"
+              [projectName]="project.name"
+              variant="ghost"
+              size="icon"
+              triggerClass="text-muted-foreground hover:text-red-500 transition-colors"
+              (deleted)="fetchProjects()"
+            >
+              <ng-icon hlm name="lucideTrash2" class="h-4 w-4"/>
+            </app-delete-project-modal>
+          </div>
         </div>
-        <button hlmBtn (click)="createProject()">Save Project</button>
+        } @else {<!-- Inline Edit Mode -->
+        <div class="space-y-3" (click)="$event.stopPropagation()">
+          <input
+            hlmInput
+            [(ngModel)]="editingName"
+            class="w-full h-9 text-sm"
+            autofocus
+            (keyup.enter)="saveUpdate(project.projectId)"
+            (keyup.esc)="cancelEdit()"
+          >
+          <div class="flex space-x-2">
+            <button hlmBtn size="sm" class="h-8 px-3" (click)="saveUpdate(project.projectId)">
+              Save
+            </button>
+            <button hlmBtn variant="outline" size="sm" class="h-8 px-3" (click)="cancelEdit()">
+              Cancel
+            </button>
+          </div>
+        </div>}
+      </div>
+
+      <div hlmCardContent class="mt-auto pt-0">
+        <div class="flex items-center text-sm text-muted-foreground">
+          <span class="font-medium text-foreground">{{ project.environmentCount || 0 }}</span>
+          <span class="ml-1">Environments</span>
+        </div>
+      </div>
     </div>
     }
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @for (project of projects(); track project.projectId) {
-        <div hlmCard
-            class="flex flex-col cursor-pointer hover:border-primary transition-all hover:shadow-md group relative"
-            (click)="viewProjectDetail(project.projectId)">
-
-            <div hlmCardHeader class="flex-1">
-                @if (editingProjectId() !== project.projectId) {
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 hlmCardTitle class="group-hover:text-primary transition-colors pr-8">{{ project.name }}</h3>
-                        <p hlmCardDescription>Created: {{ project.createdAt | date }}</p>
-                    </div>
-                    <div
-                        class="flex space-x-1 absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button (click)="startEdit(project); $event.stopPropagation()"
-                            class="p-1.5 hover:bg-muted rounded-md text-muted-foreground hover:text-primary transition-colors"
-                            title="Edit name">
-                            <ng-icon hlm name="lucideEdit" class="h-4 w-4" />
-                        </button>
-
-                        <app-delete-project-modal [projectId]="project.projectId" [projectName]="project.name"
-                            variant="ghost" size="icon"
-                            triggerClass="text-muted-foreground hover:text-red-500 transition-colors"
-                            (deleted)="fetchProjects()">
-                            <ng-icon hlm name="lucideTrash2" class="h-4 w-4" />
-                        </app-delete-project-modal>
-                    </div>
-                </div>
-                } @else {
-                <!-- Inline Edit Mode -->
-                <div class="space-y-3" (click)="$event.stopPropagation()">
-                    <input hlmInput [(ngModel)]="editingName" class="w-full h-9 text-sm" autofocus
-                        (keyup.enter)="saveUpdate(project.projectId)" (keyup.esc)="cancelEdit()">
-                    <div class="flex space-x-2">
-                        <button hlmBtn size="sm" class="h-8 px-3" (click)="saveUpdate(project.projectId)">Save</button>
-                        <button hlmBtn variant="outline" size="sm" class="h-8 px-3"
-                            (click)="cancelEdit()">Cancel</button>
-                    </div>
-                </div>
-                }
-            </div>
-
-            <div hlmCardContent class="mt-auto pt-0">
-                <div class="flex items-center text-sm text-muted-foreground">
-                    <span class="font-medium text-foreground">{{ project.environmentCount || 0 }}</span>
-                    <span class="ml-1">Environments</span>
-                </div>
-            </div>
-        </div>
-        }
-    </div>
-    }
+  </div>
+  }
 </div>

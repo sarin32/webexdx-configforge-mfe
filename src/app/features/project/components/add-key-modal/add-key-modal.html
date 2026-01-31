@@ -1,37 +1,44 @@
 <hlm-alert-dialog>
-    <button brnAlertDialogTrigger hlmBtn variant="outline" size="sm">
-        <ng-icon hlm name="lucidePlus" class="mr-2 h-4 w-4" />
-        Add Parameter
-    </button>
-    <ng-template brnAlertDialogContent let-ctx>
-        <hlm-alert-dialog-content class="sm:max-w-[425px]">
-            <hlm-alert-dialog-header>
-                <h3 hlmAlertDialogTitle>Add New Parameter</h3>
-                <p hlmAlertDialogDescription>
-                    Initialize a new key in the configuration matrix. You can set specific values for each environment
-                    after adding it.
-                </p>
-            </hlm-alert-dialog-header>
+  <button brnAlertDialogTrigger hlmBtn variant="outline" size="sm">
+    <ng-icon hlm name="lucidePlus" class="mr-2 h-4 w-4"/>
+    Add Parameter
+  </button>
+  <ng-template brnAlertDialogContent let-ctx>
+    <hlm-alert-dialog-content class="sm:max-w-[425px]">
+      <hlm-alert-dialog-header>
+        <h3 hlmAlertDialogTitle>Add New Parameter</h3>
+        <p hlmAlertDialogDescription>
+          Initialize a new key in the configuration matrix. You can set specific values for each
+          environment after adding it.
+        </p>
+      </hlm-alert-dialog-header>
 
-            <div class="py-6 space-y-4">
-                <div class="space-y-2">
-                    <label hlmLabel for="keyName" class="text-xs font-bold uppercase text-muted-foreground px-1">
-                        Parameter Key
-                    </label>
-                    <input hlmInput id="keyName" placeholder="e.g., TIMEOUT_MS" [(ngModel)]="keyName" class="w-full"
-                        (keyup.enter)="add(ctx)" autofocus>
-                    @if (error) {
-                    <p class="text-[11px] text-destructive px-1">{{ error }}</p>
-                    }
-                </div>
-            </div>
+      <div class="py-6 space-y-4">
+        <div class="space-y-2">
+          <label
+            hlmLabel
+            for="keyName"
+            class="text-xs font-bold uppercase text-muted-foreground px-1"
+          >
+            Parameter Key
+          </label>
+          <input
+            hlmInput
+            id="keyName"
+            placeholder="e.g., TIMEOUT_MS"
+            [(ngModel)]="keyName"
+            class="w-full"
+            (keyup.enter)="add(ctx)"
+            autofocus
+          >
+          @if (error) {<p class="text-[11px] text-destructive px-1">{{ error }}</p>}
+        </div>
+      </div>
 
-            <hlm-alert-dialog-footer>
-                <button hlmAlertDialogCancel (click)="ctx.close()">Cancel</button>
-                <button hlmAlertDialogAction (click)="add(ctx)" [disabled]="!keyName">
-                    Add Parameter
-                </button>
-            </hlm-alert-dialog-footer>
-        </hlm-alert-dialog-content>
-    </ng-template>
+      <hlm-alert-dialog-footer>
+        <button hlmAlertDialogCancel (click)="ctx.close()">Cancel</button>
+        <button hlmAlertDialogAction (click)="add(ctx)" [disabled]="!keyName">Add Parameter</button>
+      </hlm-alert-dialog-footer>
+    </hlm-alert-dialog-content>
+  </ng-template>
 </hlm-alert-dialog>

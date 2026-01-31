@@ -1,89 +1,107 @@
 <div class="container mx-auto py-8 space-y-8 animate-in fade-in duration-500">
-    <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-            <button hlmBtn variant="outline" size="sm" (click)="backToProject()">
-                <ng-icon hlm name="lucideChevronLeft" class="mr-1 h-4 w-4" />
-                Back to {{ project()?.name || 'Project' }}
-            </button>
-            <h1 class="text-3xl font-bold">Manage Access Tokens</h1>
-        </div>
-
-        <app-generate-token-modal [projectId]="id" [environments]="project()?.environments || []" variant="default"
-            (generated)="fetchAllTokens()">
-            <ng-icon hlm name="lucidePlus" class="mr-2 h-4 w-4" />
-            Generate New Token
-        </app-generate-token-modal>
+  <div class="flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <button hlmBtn variant="outline" size="sm" (click)="backToProject()">
+        <ng-icon hlm name="lucideChevronLeft" class="mr-1 h-4 w-4"/>
+        Back to {{ project()?.name || 'Project' }}
+      </button>
+      <h1 class="text-3xl font-bold">Manage Access Tokens</h1>
     </div>
 
-    @if (loading()) {
-    <div class="text-center py-20">
-        <p class="text-muted-foreground animate-pulse">Loading tokens...</p>
+    <app-generate-token-modal
+      [projectId]="id"
+      [environments]="project()?.environments || []"
+      variant="default"
+      (generated)="fetchAllTokens()"
+    >
+      <ng-icon hlm name="lucidePlus" class="mr-2 h-4 w-4"/>
+      Generate New Token
+    </app-generate-token-modal>
+  </div>
+  @if (loading()) {
+  <div class="text-center py-20">
+    <p class="text-muted-foreground animate-pulse">Loading tokens...</p>
+  </div>
+  } @else {
+  <div class="border rounded-xl bg-card shadow-sm border-muted overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left border-collapse">
+        <thead>
+          <tr class="bg-muted/50 border-b border-muted">
+            <th
+              scope="col"
+              class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider"
+            >
+              Name / Description
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider"
+            >
+              Environment
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider"
+            >
+              Key Hash
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider"
+            >
+              Expiry
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-right"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-muted">
+          @for (token of allTokens(); track token._id) {
+          <tr class="hover:bg-muted/30 transition-colors group">
+            <td class="px-6 py-4 font-medium text-foreground">{{ token.name }}</td>
+            <td class="px-6 py-4">
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+              >
+                {{ getEnvironmentName(token.environmentId) }}
+              </span>
+            </td>
+            <td class="px-6 py-4 font-mono text-xs text-muted-foreground">{{ token.token }}</td>
+            <td class="px-6 py-4 text-muted-foreground">
+              {{ token.expiresOn | date:'mediumDate' }}
+            </td>
+            <td class="px-6 py-4 text-right">
+              <app-revoke-token-modal
+                [tokenId]="token._id"
+                [tokenName]="token.name"
+                size="icon"
+                variant="ghost"
+                triggerClass="text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                (revoked)="fetchAllTokens()"
+              >
+                <ng-icon hlm name="lucideTrash2" class="h-4 w-4"/>
+              </app-revoke-token-modal>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="5" class="px-6 py-20 text-center text-muted-foreground italic">
+              <div class="flex flex-col items-center gap-3 opacity-40">
+                <ng-icon name="lucideKey" class="h-12 w-12"/>
+                <p class="text-lg">No active tokens found for this project.</p>
+                <p class="text-sm">Click "Generate New Token" to get started.</p>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
     </div>
-    } @else {
-    <div class="border rounded-xl bg-card shadow-sm border-muted overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left border-collapse">
-                <thead>
-                    <tr class="bg-muted/50 border-b border-muted">
-                        <th scope="col" class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider">
-                            Name / Description
-                        </th>
-                        <th scope="col" class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider">
-                            Environment
-                        </th>
-                        <th scope="col" class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider">
-                            Key Hash
-                        </th>
-                        <th scope="col" class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider">
-                            Expiry
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-right">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-muted">
-                    @for (token of allTokens(); track token._id) {
-                    <tr class="hover:bg-muted/30 transition-colors group">
-                        <td class="px-6 py-4 font-medium text-foreground">
-                            {{ token.name }}
-                        </td>
-                        <td class="px-6 py-4">
-                            <span
-                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                                {{ getEnvironmentName(token.environmentId) }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 font-mono text-xs text-muted-foreground">
-                            {{ token.token }}
-                        </td>
-                        <td class="px-6 py-4 text-muted-foreground">
-                            {{ token.expiresOn | date:'mediumDate' }}
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                            <app-revoke-token-modal [tokenId]="token._id" [tokenName]="token.name" size="icon"
-                                variant="ghost"
-                                triggerClass="text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                                (revoked)="fetchAllTokens()">
-                                <ng-icon hlm name="lucideTrash2" class="h-4 w-4" />
-                            </app-revoke-token-modal>
-                        </td>
-                    </tr>
-                    } @empty {
-                    <tr>
-                        <td colspan="5" class="px-6 py-20 text-center text-muted-foreground italic">
-                            <div class="flex flex-col items-center gap-3 opacity-40">
-                                <ng-icon name="lucideKey" class="h-12 w-12" />
-                                <p class="text-lg">No active tokens found for this project.</p>
-                                <p class="text-sm">Click "Generate New Token" to get started.</p>
-                            </div>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-    }
+  </div>
+  }
 </div>

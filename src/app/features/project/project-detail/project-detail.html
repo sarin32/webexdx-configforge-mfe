@@ -1,158 +1,185 @@
 <div class="space-y-6">
-    @if (loading()) {
-    <div class="text-center font-medium">Loading...</div>
-    }
-
-
-    <!-- Project Detail View -->
-    @if (selectedProject() && !loading()) {
-    <div class="animate-in fade-in slide-in-from-right-4 duration-300">
-        <div class="flex items-center justify-between mb-8">
-            <div class="flex items-center space-x-4">
-                <button hlmBtn variant="outline" size="sm" (click)="backToList()">
-                    <ng-icon hlm name="lucideChevronLeft" class="mr-1 h-4 w-4" />
-                    All Projects
-                </button>
-
-                @if (!isEditingTitle()) {
-                <div class="flex items-center group">
-                    <h1 class="text-3xl font-bold">{{ selectedProject()?.name }}</h1>
-                    <button (click)="startEditTitle()"
-                        class="ml-2 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted rounded-md text-muted-foreground hover:text-primary"
-                        title="Rename project">
-                        <ng-icon hlm name="lucideEdit" class="h-4 w-4" />
-                    </button>
-                </div>
-                } @else {
-                <div class="flex items-center space-x-2 animate-in slide-in-from-left-2 duration-200">
-                    <input hlmInput [(ngModel)]="editingTitle" class="h-10 text-xl font-bold w-64" autofocus
-                        (keyup.enter)="saveTitleEdit()" (keyup.esc)="cancelEditTitle()">
-                    <button hlmBtn size="sm" (click)="saveTitleEdit()">Save</button>
-                    <button hlmBtn variant="ghost" size="sm" (click)="cancelEditTitle()">Cancel</button>
-                </div>
-                }
-            </div>
-            <div class="flex space-x-2">
-                <app-delete-project-modal [projectId]="id" [projectName]="selectedProject()?.name || ''"
-                    variant="outline" size="sm" triggerClass="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    (deleted)="backToList()">
-                    <ng-icon hlm name="lucideTrash2" class="mr-2 h-4 w-4" />
-                    Delete Project
-                </app-delete-project-modal>
-                <div class="w-px h-8 bg-muted mx-1"></div>
-
-                @if (hasEnvironments()) {
-                <app-add-key-modal [existingKeys]="allKeys()" (added)="onKeyAdded($event)" />
-                }
-
-                <button hlmBtn variant="outline" size="sm" [routerLink]="['/project', id, 'tokens']">
-                    <ng-icon hlm name="lucideKey" class="mr-2 h-4 w-4" />
-                    Manage Tokens
-                </button>
-
-                <app-create-environment-modal [projectId]="id" (created)="fetchDetail(true)" />
-            </div>
+  @if (loading()) {<div class="text-center font-medium">Loading...</div>}
+  <!-- Project Detail View -->
+  @if (selectedProject() && !loading()) {
+  <div class="animate-in fade-in slide-in-from-right-4 duration-300">
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center space-x-4">
+        <button hlmBtn variant="outline" size="sm" (click)="backToList()">
+          <ng-icon hlm name="lucideChevronLeft" class="mr-1 h-4 w-4"/>
+          All Projects
+        </button>
+        @if (!isEditingTitle()) {
+        <div class="flex items-center group">
+          <h1 class="text-3xl font-bold">{{ selectedProject()?.name }}</h1>
+          <button
+            (click)="startEditTitle()"
+            class="ml-2 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted rounded-md text-muted-foreground hover:text-primary"
+            title="Rename project"
+          >
+            <ng-icon hlm name="lucideEdit" class="h-4 w-4"/>
+          </button>
         </div>
-
-        <!-- Matrix Table -->
-        <div class="border rounded-xl bg-card shadow-sm border-muted overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left border-collapse">
-                    <thead>
-                        <tr class="bg-muted/50 border-b border-muted">
-                            <th scope="col"
-                                class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider sticky left-0 z-10 bg-muted/50 border-r border-muted w-64 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
-                                Key / Environments
-                            </th>
-                            @for (env of selectedProject()?.environments; track env.id) {
-                            <th scope="col"
-                                class="px-6 py-4 font-bold text-foreground text-center min-w-[200px] border-r border-muted last:border-r-0">
-                                <div class="flex items-center justify-center space-x-2 group/header">
-                                    <span>{{ env.environmentName }}</span>
-                                    <app-delete-environment-modal [envId]="env.id"
-                                        [environmentName]="env.environmentName" size="icon" variant="ghost"
-                                        triggerClass="opacity-0 group-hover/header:opacity-100 text-red-300 hover:text-red-500 transition-opacity"
-                                        (deleted)="fetchDetail(true)">
-                                        <ng-icon hlm name="lucideTrash2" class="h-3.5 w-3.5" />
-                                    </app-delete-environment-modal>
-                                </div>
-                            </th>
-                            }
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-muted">
-                        <!-- Data Rows -->
-                        @for (key of allKeys(); track key) {
-                        <tr class="hover:bg-muted/30 transition-colors group">
-                            <th scope="row"
-                                class="px-6 py-4 font-mono font-bold text-primary sticky left-0 z-10 bg-card group-hover:bg-muted/30 border-r border-muted shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
-                                {{ key }}
-                            </th>
-
-                            @for (env of selectedProject()?.environments; track env.id) {
-                            <td class="px-6 py-4 text-center border-r border-muted last:border-r-0 relative">
-                                <div class="flex flex-col items-center justify-center min-h-[2.5rem]">
-
-                                    <!-- View Mode -->
-                                    @if (editingCell()?.key !== key || editingCell()?.envId !== env.id) {
-                                    <div (click)="startEditCell(key, env.id, matrix()[key][env.id])"
-                                        class="cursor-pointer hover:underline decoration-dashed transition-all p-1 rounded-md hover:bg-muted w-full">
-                                        @if (matrix()[key][env.id]) {
-                                        <span class="font-medium text-foreground">{{
-                                            matrix()[key][env.id].value }}</span>
-                                        } @else {
-                                        <span class="text-muted-foreground/40 italic text-xs">- Not Set -</span>
-                                        }
-                                    </div>
-
-                                    <!-- Delete small button for defined variables -->
-                                    @if (matrix()[key][env.id]) {
-                                    <app-remove-variable-modal [variableId]="matrix()[key][env.id].id" [keyName]="key"
-                                        [environmentName]="env.environmentName" size="icon" variant="ghost"
-                                        triggerClass="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-red-300 hover:text-red-500 transition-opacity"
-                                        (removed)="fetchDetail(true)">
-                                        <ng-icon hlm name="lucideX" class="h-3 w-3" />
-                                    </app-remove-variable-modal>
-                                    }
-                                    } @else {
-                                    <!-- Edit Mode -->
-                                    <div class="w-full flex items-center space-x-1 animate-in zoom-in-95 duration-150">
-                                        <input hlmInput size="sm" [(ngModel)]="editingValue"
-                                            class="flex-1 h-8 text-xs text-center" autofocus (keyup.enter)="saveCell()"
-                                            (keyup.esc)="cancelEditCell()">
-                                        <div class="flex flex-col space-y-0.5">
-                                            <button (click)="saveCell()"
-                                                class="text-green-600 hover:text-green-700 p-0.5">
-                                                <ng-icon hlm name="lucideCheck" class="h-3.5 w-3.5" />
-                                            </button>
-                                            <button (click)="cancelEditCell()"
-                                                class="text-muted-foreground hover:text-foreground p-0.5">
-                                                <ng-icon hlm name="lucideX" class="h-3.5 w-3.5" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                    }
-                                </div>
-                            </td>
-                            }
-                        </tr>
-                        } @empty {
-                        <!-- Empty State -->
-                        <tr>
-                            <td [attr.colspan]="(selectedProject()?.environments?.length || 0) + 1"
-                                class="px-6 py-12 text-center text-muted-foreground italic">
-                                @if (hasEnvironments()) {
-                                No parameters defined. Use "Add Parameter" to start.
-                                } @else {
-                                Create an environment first to add and manage parameters.
-                                }
-                            </td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+        } @else {
+        <div class="flex items-center space-x-2 animate-in slide-in-from-left-2 duration-200">
+          <input
+            hlmInput
+            [(ngModel)]="editingTitle"
+            class="h-10 text-xl font-bold w-64"
+            autofocus
+            (keyup.enter)="saveTitleEdit()"
+            (keyup.esc)="cancelEditTitle()"
+          >
+          <button hlmBtn size="sm" (click)="saveTitleEdit()">Save</button>
+          <button hlmBtn variant="ghost" size="sm" (click)="cancelEditTitle()">Cancel</button>
         </div>
+        }
+      </div>
+      <div class="flex space-x-2">
+        <app-delete-project-modal
+          [projectId]="id"
+          [projectName]="selectedProject()?.name || ''"
+          variant="outline"
+          size="sm"
+          triggerClass="text-red-500 hover:text-red-700 hover:bg-red-50"
+          (deleted)="backToList()"
+        >
+          <ng-icon hlm name="lucideTrash2" class="mr-2 h-4 w-4"/>
+          Delete Project
+        </app-delete-project-modal>
+        <div class="w-px h-8 bg-muted mx-1"></div>
+        @if (hasEnvironments()) {
+        <app-add-key-modal [existingKeys]="allKeys()" (added)="onKeyAdded($event)"/>}
+
+        <button hlmBtn variant="outline" size="sm" [routerLink]="['/project', id, 'tokens']">
+          <ng-icon hlm name="lucideKey" class="mr-2 h-4 w-4"/>
+          Manage Tokens
+        </button>
+
+        <app-create-environment-modal [projectId]="id" (created)="fetchDetail(true)"/>
+      </div>
     </div>
-    }
+
+    <!-- Matrix Table -->
+    <div class="border rounded-xl bg-card shadow-sm border-muted overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left border-collapse">
+          <thead>
+            <tr class="bg-muted/50 border-b border-muted">
+              <th
+                scope="col"
+                class="px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider sticky left-0 z-10 bg-muted/50 border-r border-muted w-64 shadow-[2px_0_5px_rgba(0,0,0,0.05)]"
+              >
+                Key / Environments
+              </th>
+              @for (env of selectedProject()?.environments; track env.id) {
+              <th
+                scope="col"
+                class="px-6 py-4 font-bold text-foreground text-center min-w-[200px] border-r border-muted last:border-r-0"
+              >
+                <div class="flex items-center justify-center space-x-2 group/header">
+                  <span>{{ env.environmentName }}</span>
+                  <app-delete-environment-modal
+                    [envId]="env.id"
+                    [environmentName]="env.environmentName"
+                    size="icon"
+                    variant="ghost"
+                    triggerClass="opacity-0 group-hover/header:opacity-100 text-red-300 hover:text-red-500 transition-opacity"
+                    (deleted)="fetchDetail(true)"
+                  >
+                    <ng-icon hlm name="lucideTrash2" class="h-3.5 w-3.5"/>
+                  </app-delete-environment-modal>
+                </div>
+              </th>
+              }
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-muted">
+            <!-- Data Rows -->
+            @for (key of allKeys(); track key) {
+            <tr class="hover:bg-muted/30 transition-colors group">
+              <th
+                scope="row"
+                class="px-6 py-4 font-mono font-bold text-primary sticky left-0 z-10 bg-card group-hover:bg-muted/30 border-r border-muted shadow-[2px_0_5px_rgba(0,0,0,0.05)]"
+              >
+                {{ key }}
+              </th>
+              @for (env of selectedProject()?.environments; track env.id) {
+              <td class="px-6 py-4 text-center border-r border-muted last:border-r-0 relative">
+                <div class="flex flex-col items-center justify-center min-h-[2.5rem]">
+                  <!-- View Mode -->
+                  @if (editingCell()?.key !== key || editingCell()?.envId !== env.id) {
+                  <div
+                    (click)="startEditCell(key, env.id, matrix()[key][env.id])"
+                    class="cursor-pointer hover:underline decoration-dashed transition-all p-1 rounded-md hover:bg-muted w-full"
+                  >
+                    @if (matrix()[key][env.id]) {
+                    <span class="font-medium text-foreground"
+                      >{{
+                                            matrix()[key][env.id].value }}</span
+                    >
+                    } @else {
+                    <span class="text-muted-foreground/40 italic text-xs">- Not Set -</span>}
+                  </div>
+                  <!-- Delete small button for defined variables -->
+                  @if (matrix()[key][env.id]) {
+                  <app-remove-variable-modal
+                    [variableId]="matrix()[key][env.id].id"
+                    [keyName]="key"
+                    [environmentName]="env.environmentName"
+                    size="icon"
+                    variant="ghost"
+                    triggerClass="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-red-300 hover:text-red-500 transition-opacity"
+                    (removed)="fetchDetail(true)"
+                  >
+                    <ng-icon hlm name="lucideX" class="h-3 w-3"/>
+                  </app-remove-variable-modal>
+                  } } @else {<!-- Edit Mode -->
+                  <div
+                    class="w-full flex items-center space-x-1 animate-in zoom-in-95 duration-150"
+                  >
+                    <input
+                      hlmInput
+                      size="sm"
+                      [(ngModel)]="editingValue"
+                      class="flex-1 h-8 text-xs text-center"
+                      autofocus
+                      (keyup.enter)="saveCell()"
+                      (keyup.esc)="cancelEditCell()"
+                    >
+                    <div class="flex flex-col space-y-0.5">
+                      <button
+                        (click)="saveCell()"
+                        class="text-green-600 hover:text-green-700 p-0.5"
+                      >
+                        <ng-icon hlm name="lucideCheck" class="h-3.5 w-3.5"/>
+                      </button>
+                      <button
+                        (click)="cancelEditCell()"
+                        class="text-muted-foreground hover:text-foreground p-0.5"
+                      >
+                        <ng-icon hlm name="lucideX" class="h-3.5 w-3.5"/>
+                      </button>
+                    </div>
+                  </div>}
+                </div>
+              </td>
+              }
+            </tr>
+            } @empty {<!-- Empty State -->
+            <tr>
+              <td
+                [attr.colspan]="(selectedProject()?.environments?.length || 0) + 1"
+                class="px-6 py-12 text-center text-muted-foreground italic"
+              >
+                @if (hasEnvironments()) { No parameters defined. Use "Add Parameter" to start. }
+                @else { Create an environment first to add and manage parameters. }
+              </td>
+            </tr>}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  }
 </div>

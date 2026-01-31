@@ -13,39 +13,19 @@
     "target": "ES2022",
     "module": "preserve",
     "paths": {
-      "@spartan-ng/helm/button": [
-        "./libs/ui/ui-button-helm/src/index.ts"
-      ],
-      "@spartan-ng/helm/calendar": [
-        "./libs/ui/ui-calendar-helm/src/index.ts"
-      ],
-      "@spartan-ng/helm/card": [
-        "./libs/ui/ui-card-helm/src/index.ts"
-      ],
+      "@spartan-ng/helm/button": ["./libs/ui/ui-button-helm/src/index.ts"],
+      "@spartan-ng/helm/calendar": ["./libs/ui/ui-calendar-helm/src/index.ts"],
+      "@spartan-ng/helm/card": ["./libs/ui/ui-card-helm/src/index.ts"],
       "@spartan-ng/helm/date-picker": [
         "./libs/ui/ui-date-picker-helm/src/index.ts"
       ],
-      "@spartan-ng/helm/icon": [
-        "./libs/ui/ui-icon-helm/src/index.ts"
-      ],
-      "@spartan-ng/helm/input": [
-        "./libs/ui/ui-input-helm/src/index.ts"
-      ],
-      "@spartan-ng/helm/label": [
-        "./libs/ui/ui-label-helm/src/index.ts"
-      ],
-      "@spartan-ng/helm/popover": [
-        "./libs/ui/ui-popover-helm/src/index.ts"
-      ],
-      "@spartan-ng/helm/select": [
-        "./libs/ui/ui-select-helm/src/index.ts"
-      ],
-      "@spartan-ng/helm/menu": [
-        "./libs/ui/ui-menu-helm/src/index.ts"
-      ],
-      "@spartan-ng/helm/sonner": [
-        "./libs/ui/ui-sonner-helm/src/index.ts"
-      ],
+      "@spartan-ng/helm/icon": ["./libs/ui/ui-icon-helm/src/index.ts"],
+      "@spartan-ng/helm/input": ["./libs/ui/ui-input-helm/src/index.ts"],
+      "@spartan-ng/helm/label": ["./libs/ui/ui-label-helm/src/index.ts"],
+      "@spartan-ng/helm/popover": ["./libs/ui/ui-popover-helm/src/index.ts"],
+      "@spartan-ng/helm/select": ["./libs/ui/ui-select-helm/src/index.ts"],
+      "@spartan-ng/helm/menu": ["./libs/ui/ui-menu-helm/src/index.ts"],
+      "@spartan-ng/helm/sonner": ["./libs/ui/ui-sonner-helm/src/index.ts"],
       "@spartan-ng/helm/alert-dialog": [
         "./libs/ui/ui-alert-dialog-helm/src/index.ts"
       ]

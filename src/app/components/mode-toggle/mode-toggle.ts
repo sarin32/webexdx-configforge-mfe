@@ -7,17 +7,17 @@ import { HlmMenu, HlmMenuItem } from '@spartan-ng/helm/menu';
 import { type Theme, ThemeService } from '../../services/theme.service';
 
 @Component({
-    selector: 'app-mode-toggle',
-    standalone: true,
-    imports: [BrnMenuTrigger, HlmMenu, HlmMenuItem, HlmButtonModule, NgIcon],
-    providers: [provideIcons({ lucideMoon, lucideSun })],
-    templateUrl: './mode-toggle.html',
+  selector: 'app-mode-toggle',
+  standalone: true,
+  imports: [BrnMenuTrigger, HlmMenu, HlmMenuItem, HlmButtonModule, NgIcon],
+  providers: [provideIcons({ lucideMoon, lucideSun })],
+  templateUrl: './mode-toggle.html',
 })
 export class ModeToggle {
-    private readonly _themeService = inject(ThemeService);
-    theme = this._themeService.theme;
+  private readonly _themeService = inject(ThemeService);
+  theme = this._themeService.theme;
 
-    setTheme(theme: Theme) {
-        this._themeService.setTheme(theme);
-    }
+  setTheme(theme: Theme) {
+    this._themeService.setTheme(theme);
+  }
 }

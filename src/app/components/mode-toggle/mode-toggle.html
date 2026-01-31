@@ -1,14 +1,20 @@
 <button hlmBtn variant="outline" size="icon" [brnMenuTriggerFor]="menu">
-    <ng-icon hlm name="lucideSun"
-        class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-    <ng-icon hlm name="lucideMoon"
-        class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-    <span class="sr-only">Toggle theme</span>
+  <ng-icon
+    hlm
+    name="lucideSun"
+    class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+  />
+  <ng-icon
+    hlm
+    name="lucideMoon"
+    class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+  />
+  <span class="sr-only">Toggle theme</span>
 </button>
 <ng-template #menu>
-    <hlm-menu class="w-56">
-        <button hlmMenuItem (click)="setTheme('light')">Light</button>
-        <button hlmMenuItem (click)="setTheme('dark')">Dark</button>
-        <button hlmMenuItem (click)="setTheme('system')">System</button>
-    </hlm-menu>
+  <hlm-menu class="w-56">
+    <button hlmMenuItem (click)="setTheme('light')">Light</button>
+    <button hlmMenuItem (click)="setTheme('dark')">Dark</button>
+    <button hlmMenuItem (click)="setTheme('system')">System</button>
+  </hlm-menu>
 </ng-template>

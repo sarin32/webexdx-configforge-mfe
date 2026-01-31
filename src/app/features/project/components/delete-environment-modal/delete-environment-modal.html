@@ -1,24 +1,29 @@
 <hlm-alert-dialog>
-    <button brnAlertDialogTrigger hlmBtn [variant]="variant()" [size]="size()" [class]="triggerClass()"
-        (click)="$event.stopPropagation()">
-        <ng-content />
-    </button>
-    <ng-template brnAlertDialogContent let-ctx>
-        <hlm-alert-dialog-content>
-            <hlm-alert-dialog-header>
-                <h3 hlmAlertDialogTitle>Delete Environment</h3>
-                <p hlmAlertDialogDescription>
-                    Are you sure you want to delete the <strong>{{ environmentName() }}</strong> environment? All
-                    variables in this environment
-                    will be lost.
-                </p>
-            </hlm-alert-dialog-header>
-            <hlm-alert-dialog-footer>
-                <button hlmAlertDialogCancel (click)="ctx.close()">Cancel</button>
-                <button hlmAlertDialogAction variant="destructive" (click)="onDelete(ctx)">
-                    {{ loading() ? 'Deleting...' : 'Delete Environment' }}
-                </button>
-            </hlm-alert-dialog-footer>
-        </hlm-alert-dialog-content>
-    </ng-template>
+  <button
+    brnAlertDialogTrigger
+    hlmBtn
+    [variant]="variant()"
+    [size]="size()"
+    [class]="triggerClass()"
+    (click)="$event.stopPropagation()"
+  >
+    <ng-content/>
+  </button>
+  <ng-template brnAlertDialogContent let-ctx>
+    <hlm-alert-dialog-content>
+      <hlm-alert-dialog-header>
+        <h3 hlmAlertDialogTitle>Delete Environment</h3>
+        <p hlmAlertDialogDescription>
+          Are you sure you want to delete the <strong>{{ environmentName() }}</strong>environment?
+          All variables in this environment will be lost.
+        </p>
+      </hlm-alert-dialog-header>
+      <hlm-alert-dialog-footer>
+        <button hlmAlertDialogCancel (click)="ctx.close()">Cancel</button>
+        <button hlmAlertDialogAction variant="destructive" (click)="onDelete(ctx)">
+          {{ loading() ? 'Deleting...' : 'Delete Environment' }}
+        </button>
+      </hlm-alert-dialog-footer>
+    </hlm-alert-dialog-content>
+  </ng-template>
 </hlm-alert-dialog>

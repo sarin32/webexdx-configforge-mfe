@@ -21,6 +21,6 @@ export const authInterceptor: HttpInterceptorFn = (
         window.location.href = `${environment.authAppUrl}/login`;
       }
       return throwError(() => error);
-    })
+    }),
   );
 };

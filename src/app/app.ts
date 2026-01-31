@@ -10,4 +10,4 @@ import { Navbar } from './components/navbar/navbar';
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App { }
+export class App {}

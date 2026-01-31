@@ -9,14 +9,14 @@ import { provideIcons } from '@ng-icons/core';
 import {
   lucideCheck,
   lucideChevronLeft,
+  lucideCopy,
   lucideEdit,
+  lucideKey,
   lucideMoon,
   lucidePlus,
   lucideSun,
   lucideTrash2,
   lucideX,
-  lucideKey,
-  lucideCopy,
 } from '@ng-icons/lucide';
 
 import { routes } from './app.routes';
