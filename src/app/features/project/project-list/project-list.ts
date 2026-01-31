@@ -1,5 +1,4 @@
 import { DatePipe } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal, type OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,6 +9,10 @@ import { HlmIcon } from '@spartan-ng/helm/icon';
 import { HlmInput } from '@spartan-ng/helm/input';
 import { lastValueFrom } from 'rxjs';
 import { NgIcon } from '@ng-icons/core';
+import { toast } from 'ngx-sonner';
+import { BrnAlertDialogContent, BrnAlertDialogTrigger } from '@spartan-ng/brain/alert-dialog';
+import { HlmAlertDialogImports } from '@spartan-ng/helm/alert-dialog';
+import { handleError } from '../../../utils/error-utils';
 import { ProjectService, type ProjectData } from '../services/project-api';
 
 @Component({
@@ -25,6 +28,9 @@ import { ProjectService, type ProjectData } from '../services/project-api';
         FormsModule,
         HlmIcon,
         NgIcon,
+        BrnAlertDialogTrigger,
+        BrnAlertDialogContent,
+        HlmAlertDialogImports,
     ],
     templateUrl: './project-list.html',
 })
@@ -34,7 +40,6 @@ export class ProjectList implements OnInit {
 
     projects = signal<ProjectData[]>([]);
     loading = signal(false);
-    error = signal<string | null>(null);
 
     showCreateProject = signal(false);
     newProjectName = '';
@@ -48,12 +53,11 @@ export class ProjectList implements OnInit {
 
     async fetchProjects() {
         this.loading.set(true);
-        this.error.set(null);
         try {
             const response = await lastValueFrom(this.projectService.getProjectList());
             this.projects.set(response);
         } catch (err) {
-            this.handleError(err);
+            handleError(err);
         } finally {
             this.loading.set(false);
         }
@@ -63,11 +67,12 @@ export class ProjectList implements OnInit {
         if (!this.newProjectName) return;
         try {
             await lastValueFrom(this.projectService.createProject({ name: this.newProjectName }));
+            toast.success('Project created successfully');
             this.newProjectName = '';
             this.showCreateProject.set(false);
             await this.fetchProjects();
         } catch (err) {
-            this.handleError(err);
+            handleError(err);
         }
     }
 
@@ -88,28 +93,21 @@ export class ProjectList implements OnInit {
         if (!this.editingName()) return;
         try {
             await lastValueFrom(this.projectService.updateProject(projectId, { name: this.editingName() }));
+            toast.success('Project updated successfully');
             this.editingProjectId.set(null);
             await this.fetchProjects();
         } catch (err) {
-            this.handleError(err);
+            handleError(err);
         }
     }
 
     async deleteProject(projectId: string) {
-        if (!window.confirm('Are you sure you want to delete this project? All environments and variables will be lost.')) return;
         try {
             await lastValueFrom(this.projectService.deleteProject(projectId));
+            toast.success('Project deleted successfully');
             await this.fetchProjects();
         } catch (err) {
-            this.handleError(err);
+            handleError(err);
         }
-    }
-
-    private handleError(err: any) {
-        let message = 'Something went wrong';
-        if (err instanceof HttpErrorResponse) {
-            message = err.error.message || message;
-        }
-        this.error.set(message);
     }
 }

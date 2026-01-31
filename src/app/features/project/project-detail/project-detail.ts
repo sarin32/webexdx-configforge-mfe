@@ -1,4 +1,3 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { computed, Component, inject, Input, signal, type OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,6 +7,10 @@ import { HlmIcon } from '@spartan-ng/helm/icon';
 import { HlmInput } from '@spartan-ng/helm/input';
 import { lastValueFrom } from 'rxjs';
 import { NgIcon } from '@ng-icons/core';
+import { toast } from 'ngx-sonner';
+import { BrnAlertDialogContent, BrnAlertDialogTrigger } from '@spartan-ng/brain/alert-dialog';
+import { HlmAlertDialogImports } from '@spartan-ng/helm/alert-dialog';
+import { handleError } from '../../../utils/error-utils';
 import { ProjectService, type GetProjectDataInDetailResult, type DetailedVariableData } from '../services/project-api';
 import { VariableApi } from '../services/variable-api';
 import { EnvironmentApi } from '../services/environment-api';
@@ -21,6 +24,9 @@ import { EnvironmentApi } from '../services/environment-api';
         FormsModule,
         HlmIcon,
         NgIcon,
+        BrnAlertDialogTrigger,
+        BrnAlertDialogContent,
+        HlmAlertDialogImports,
     ],
     templateUrl: './project-detail.html',
 })
@@ -34,7 +40,6 @@ export class ProjectDetail implements OnInit {
 
     selectedProject = signal<GetProjectDataInDetailResult | null>(null);
     loading = signal(false);
-    error = signal<string | null>(null);
 
     // Computed signals for matrix view
     hasEnvironments = computed(() => (this.selectedProject()?.environments.length ?? 0) > 0);
@@ -96,7 +101,6 @@ export class ProjectDetail implements OnInit {
 
     async fetchDetail(silent = false) {
         if (!silent) this.loading.set(true);
-        this.error.set(null);
         try {
             const response = await lastValueFrom(this.projectService.getProjectDetail(this.id));
             this.selectedProject.set(response);
@@ -110,7 +114,7 @@ export class ProjectDetail implements OnInit {
             }
             this.extraKeys.update(keys => keys.filter(k => !responseKeys.has(k)));
         } catch (err) {
-            this.handleError(err);
+            handleError(err);
         } finally {
             if (!silent) this.loading.set(false);
         }
@@ -124,27 +128,26 @@ export class ProjectDetail implements OnInit {
         if (!this.newEnvironmentName) return;
 
         try {
-            this.error.set(null);
             await lastValueFrom(this.environmentApi.createEnvironment({
                 name: this.newEnvironmentName,
                 projectId: this.id
             }));
+            toast.success('Environment created successfully');
             this.newEnvironmentName = '';
             this.showCreateEnvironment.set(false);
             await this.fetchDetail(true);
         } catch (err) {
-            this.handleError(err);
+            handleError(err);
         }
     }
 
     async deleteEnvironment(envId: string) {
-        if (!window.confirm('Are you sure you want to delete this environment? All variables in this environment will be lost.')) return;
-
         try {
             await lastValueFrom(this.environmentApi.deleteEnvironment(envId));
+            toast.success('Environment deleted successfully');
             await this.fetchDetail(true);
         } catch (err) {
-            this.handleError(err);
+            handleError(err);
         }
     }
 
@@ -164,20 +167,21 @@ export class ProjectDetail implements OnInit {
         if (!this.editingTitle()) return;
         try {
             await lastValueFrom(this.projectService.updateProject(this.id, { name: this.editingTitle() }));
+            toast.success('Project renamed successfully');
             this.isEditingTitle.set(false);
             await this.fetchDetail(true);
         } catch (err) {
-            this.handleError(err);
+            handleError(err);
         }
     }
 
     async deleteProject() {
-        if (!window.confirm('Are you sure you want to delete this project? All environments and variables will be lost.')) return;
         try {
             await lastValueFrom(this.projectService.deleteProject(this.id));
+            toast.success('Project deleted successfully');
             this.backToList();
         } catch (err) {
-            this.handleError(err);
+            handleError(err);
         }
     }
 
@@ -226,29 +230,21 @@ export class ProjectDetail implements OnInit {
                     value: this.editingValue
                 }));
             }
+            toast.success('Variable updated successfully');
             this.editingCell.set(null);
             await this.fetchDetail(true);
         } catch (err) {
-            this.handleError(err);
+            handleError(err);
         }
     }
 
     async deleteVariable(variableId: string) {
-        if (!window.confirm('Are you sure you want to delete this variable override?')) return;
-
         try {
             await lastValueFrom(this.variableApi.deleteVariable(variableId));
+            toast.success('Variable override removed');
             await this.fetchDetail(true);
         } catch (err) {
-            this.handleError(err);
+            handleError(err);
         }
-    }
-
-    private handleError(err: any) {
-        let message = 'Something went wrong';
-        if (err instanceof HttpErrorResponse) {
-            message = err.error.message || message;
-        }
-        this.error.set(message);
     }
 }

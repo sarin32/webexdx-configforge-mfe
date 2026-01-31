@@ -3,9 +3,6 @@
     <div class="text-center font-medium">Loading...</div>
     }
 
-    @if (error()) {
-    <div class="p-4 bg-red-100 text-red-700 rounded-md">{{ error() }}</div>
-    }
 
     <!-- Project Detail View -->
     @if (selectedProject() && !loading()) {
@@ -36,11 +33,27 @@
                 }
             </div>
             <div class="flex space-x-2">
-                <button hlmBtn variant="outline" size="sm" class="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    (click)="deleteProject()">
-                    <ng-icon hlm name="lucideTrash2" class="mr-2 h-4 w-4" />
-                    Delete Project
-                </button>
+                <hlm-alert-dialog>
+                    <button brnAlertDialogTrigger hlmBtn variant="outline" size="sm"
+                        class="text-red-500 hover:text-red-700 hover:bg-red-50">
+                        <ng-icon hlm name="lucideTrash2" class="mr-2 h-4 w-4" />
+                        Delete Project
+                    </button>
+                    <hlm-alert-dialog-content *brnAlertDialogContent="let ctx">
+                        <hlm-alert-dialog-header>
+                            <h3 hlmAlertDialogTitle>Delete Project</h3>
+                            <p hlmAlertDialogDescription>
+                                Are you sure you want to delete <strong>{{ selectedProject()?.name }}</strong>? This
+                                action will permanently remove all environments and variables.
+                            </p>
+                        </hlm-alert-dialog-header>
+                        <hlm-alert-dialog-footer>
+                            <button hlmBtn variant="ghost" (click)="ctx.close()">Cancel</button>
+                            <button hlmBtn variant="destructive" (click)="deleteProject(); ctx.close()">Delete
+                                Project</button>
+                        </hlm-alert-dialog-footer>
+                    </hlm-alert-dialog-content>
+                </hlm-alert-dialog>
                 <div class="w-px h-8 bg-muted mx-1"></div>
                 @if (hasEnvironments()) {
                 <button hlmBtn variant="outline" size="sm" (click)="toggleAddKey()">
@@ -101,11 +114,29 @@
                                 class="px-6 py-4 font-bold text-foreground text-center min-w-[200px] border-r border-muted last:border-r-0">
                                 <div class="flex items-center justify-center space-x-2 group/header">
                                     <span>{{ env.environmentName }}</span>
-                                    <button (click)="deleteEnvironment(env.id); $event.stopPropagation()"
-                                        class="opacity-0 group-hover/header:opacity-100 text-red-300 hover:text-red-500 transition-opacity p-0.5"
-                                        title="Delete environment">
-                                        <ng-icon hlm name="lucideTrash2" class="h-3.5 w-3.5" />
-                                    </button>
+                                    <hlm-alert-dialog>
+                                        <button brnAlertDialogTrigger (click)="$event.stopPropagation()"
+                                            class="opacity-0 group-hover/header:opacity-100 text-red-300 hover:text-red-500 transition-opacity p-0.5"
+                                            title="Delete environment">
+                                            <ng-icon hlm name="lucideTrash2" class="h-3.5 w-3.5" />
+                                        </button>
+                                        <hlm-alert-dialog-content *brnAlertDialogContent="let ctx">
+                                            <hlm-alert-dialog-header>
+                                                <h3 hlmAlertDialogTitle>Delete Environment</h3>
+                                                <p hlmAlertDialogDescription>
+                                                    Are you sure you want to delete the <strong>{{ env.environmentName
+                                                        }}</strong> environment? All variables in this environment will
+                                                    be lost.
+                                                </p>
+                                            </hlm-alert-dialog-header>
+                                            <hlm-alert-dialog-footer>
+                                                <button hlmBtn variant="ghost" (click)="ctx.close()">Cancel</button>
+                                                <button hlmBtn variant="destructive"
+                                                    (click)="deleteEnvironment(env.id); ctx.close()">Delete
+                                                    Environment</button>
+                                            </hlm-alert-dialog-footer>
+                                        </hlm-alert-dialog-content>
+                                    </hlm-alert-dialog>
                                 </div>
                             </th>
                             }
@@ -138,11 +169,28 @@
 
                                     <!-- Delete small button for defined variables -->
                                     @if (matrix()[key][env.id]) {
-                                    <button (click)="deleteVariable(matrix()[key][env.id].id); $event.stopPropagation()"
-                                        class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-red-300 hover:text-red-500 transition-opacity p-0.5"
-                                        title="Remove value">
-                                        <ng-icon hlm name="lucideX" class="h-3 w-3" />
-                                    </button>
+                                    <hlm-alert-dialog>
+                                        <button brnAlertDialogTrigger (click)="$event.stopPropagation()"
+                                            class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-red-300 hover:text-red-500 transition-opacity p-0.5"
+                                            title="Remove value">
+                                            <ng-icon hlm name="lucideX" class="h-3 w-3" />
+                                        </button>
+                                        <hlm-alert-dialog-content *brnAlertDialogContent="let ctx">
+                                            <hlm-alert-dialog-header>
+                                                <h3 hlmAlertDialogTitle>Remove Variable Override</h3>
+                                                <p hlmAlertDialogDescription>
+                                                    Are you sure you want to remove the override for <strong>{{ key
+                                                        }}</strong> in <strong>{{ env.environmentName }}</strong>?
+                                                </p>
+                                            </hlm-alert-dialog-header>
+                                            <hlm-alert-dialog-footer>
+                                                <button hlmBtn variant="ghost" (click)="ctx.close()">Cancel</button>
+                                                <button hlmBtn variant="destructive"
+                                                    (click)="deleteVariable(matrix()[key][env.id].id); ctx.close()">Remove
+                                                    Override</button>
+                                            </hlm-alert-dialog-footer>
+                                        </hlm-alert-dialog-content>
+                                    </hlm-alert-dialog>
                                     }
                                     } @else {
                                     <!-- Edit Mode -->

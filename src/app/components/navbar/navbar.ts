@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
+import { handleError } from '../../utils/error-utils';
 import { HlmButtonModule } from '@spartan-ng/helm/button';
 import { environment } from '../../../environments/environment';
 import { ModeToggle } from '../mode-toggle/mode-toggle';
@@ -26,7 +27,8 @@ export class Navbar {
                 next: () => {
                     window.location.href = `${environment.authAppUrl}/login`;
                 },
-                error: () => {
+                error: (err) => {
+                    handleError(err, 'Logout failed');
                     // Even if error, redirect to login
                     window.location.href = `${environment.authAppUrl}/login`;
                 },
