@@ -42,10 +42,12 @@
                     Delete Project
                 </button>
                 <div class="w-px h-8 bg-muted mx-1"></div>
+                @if (hasEnvironments()) {
                 <button hlmBtn variant="outline" size="sm" (click)="toggleAddKey()">
                     <ng-icon hlm [name]="showAddKey() ? 'lucideX' : 'lucidePlus'" class="mr-2 h-4 w-4" />
                     {{ showAddKey() ? 'Cancel' : 'Add Parameter' }}
                 </button>
+                }
                 <button hlmBtn variant="default" size="sm"
                     (click)="showCreateEnvironment.set(!showCreateEnvironment())">
                     <ng-icon hlm [name]="showCreateEnvironment() ? 'lucideX' : 'lucidePlus'" class="mr-2 h-4 w-4" />
@@ -69,7 +71,7 @@
         }
 
         <!-- Add Key Form (Optional row addition) -->
-        @if (showAddKey()) {
+        @if (showAddKey() && hasEnvironments()) {
         <div
             class="mb-10 p-5 border rounded-xl bg-muted/20 flex flex-col md:flex-row items-end gap-3 animate-in fade-in slide-in-from-top-4 duration-200 border-dashed">
             <div class="flex-1 w-full space-y-1">
@@ -97,8 +99,13 @@
                             @for (env of selectedProject()?.environments; track env.id) {
                             <th scope="col"
                                 class="px-6 py-4 font-bold text-foreground text-center min-w-[200px] border-r border-muted last:border-r-0">
-                                <div class="flex items-center justify-center space-x-2">
+                                <div class="flex items-center justify-center space-x-2 group/header">
                                     <span>{{ env.environmentName }}</span>
+                                    <button (click)="deleteEnvironment(env.id); $event.stopPropagation()"
+                                        class="opacity-0 group-hover/header:opacity-100 text-red-300 hover:text-red-500 transition-opacity p-0.5"
+                                        title="Delete environment">
+                                        <ng-icon hlm name="lucideTrash2" class="h-3.5 w-3.5" />
+                                    </button>
                                 </div>
                             </th>
                             }
@@ -164,7 +171,11 @@
                         <tr>
                             <td [attr.colspan]="(selectedProject()?.environments?.length || 0) + 1"
                                 class="px-6 py-12 text-center text-muted-foreground italic">
+                                @if (hasEnvironments()) {
                                 No parameters defined. Use "Add Parameter" to start.
+                                } @else {
+                                Create an environment first to add and manage parameters.
+                                }
                             </td>
                         </tr>
                         }

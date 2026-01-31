@@ -37,6 +37,7 @@ export class ProjectDetail implements OnInit {
     error = signal<string | null>(null);
 
     // Computed signals for matrix view
+    hasEnvironments = computed(() => (this.selectedProject()?.environments.length ?? 0) > 0);
     extraKeys = signal<string[]>([]);
 
     allKeys = computed(() => {
@@ -136,6 +137,17 @@ export class ProjectDetail implements OnInit {
         }
     }
 
+    async deleteEnvironment(envId: string) {
+        if (!window.confirm('Are you sure you want to delete this environment? All variables in this environment will be lost.')) return;
+
+        try {
+            await lastValueFrom(this.environmentApi.deleteEnvironment(envId));
+            await this.fetchDetail(true);
+        } catch (err) {
+            this.handleError(err);
+        }
+    }
+
     // Project Actions
     startEditTitle() {
         const project = this.selectedProject();
@@ -171,6 +183,7 @@ export class ProjectDetail implements OnInit {
 
     // Row (Key) management
     toggleAddKey() {
+        if (!this.hasEnvironments()) return;
         this.showAddKey.set(!this.showAddKey());
         this.newKeyName = '';
     }

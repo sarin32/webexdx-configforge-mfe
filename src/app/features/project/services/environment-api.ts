@@ -12,4 +12,8 @@ export class EnvironmentApi {
     createEnvironment(data: { name: string; projectId: string }) {
         return this.http.post<{ environmentId: string }>(this.baseUrl, data);
     }
+
+    deleteEnvironment(id: string) {
+        return this.http.delete(`${this.baseUrl}/${id}`);
+    }
 }
