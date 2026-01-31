@@ -1,0 +1,72 @@
+<hlm-alert-dialog>
+    <button brnAlertDialogTrigger hlmBtn [variant]="variant()" [size]="size()" [class]="triggerClass()"
+        (click)="$event.stopPropagation()">
+        <ng-content />
+    </button>
+    <ng-template brnAlertDialogContent let-ctx>
+        <hlm-alert-dialog-content class="sm:max-w-[500px]">
+            <hlm-alert-dialog-header>
+                <h3 hlmAlertDialogTitle>Generate New Token</h3>
+                <p hlmAlertDialogDescription>
+                    Create a new token for an environment. Copy it immediately as it won't be shown again.
+                </p>
+            </hlm-alert-dialog-header>
+
+            @if (!generatedToken()) {
+            <div class="py-6 space-y-6">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase text-muted-foreground px-1">Target Environment</label>
+                    <brn-select [(ngModel)]="selectedEnvId">
+                        <hlm-select-trigger class="w-full">
+                            <hlm-select-value />
+                        </hlm-select-trigger>
+                        <hlm-select-content>
+                            @for (env of environments(); track env.id) {
+                            <hlm-option [value]="env.id">{{ env.environmentName }}</hlm-option>
+                            }
+                        </hlm-select-content>
+                    </brn-select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase text-muted-foreground px-1">Description / Name</label>
+                    <input hlmInput [(ngModel)]="tokenName" placeholder="e.g. Jenkins CI" class="w-full">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase text-muted-foreground px-1">Expiry (Days)</label>
+                    <input hlmInput type="number" [(ngModel)]="tokenExpiry" class="w-full">
+                </div>
+            </div>
+            } @else {
+            <div class="py-6 space-y-4 animate-in zoom-in-95 duration-300">
+                <div class="p-4 border-2 border-green-500/30 rounded-xl bg-green-50/50 dark:bg-green-950/20">
+                    <div class="flex items-center justify-between mb-3 text-green-700 dark:text-green-400">
+                        <span class="text-xs font-bold uppercase">Success: Token Generated</span>
+                    </div>
+                    <div
+                        class="flex items-center gap-3 bg-background p-3 rounded-lg border border-green-500/20 font-mono text-sm break-all">
+                        <span class="flex-1 select-all font-bold tracking-tight">{{ generatedToken() }}</span>
+                        <button (click)="copyToClipboard(generatedToken()!)" class="p-2 hover:bg-muted rounded-md"
+                            title="Copy">
+                            <ng-icon name="lucideCopy" class="h-4 w-4" />
+                        </button>
+                    </div>
+                    <p class="mt-3 text-[11px] text-green-800 dark:text-green-500 italic">
+                        Copy this token now. It will not be shown again.
+                    </p>
+                </div>
+            </div>
+            }
+
+            <hlm-alert-dialog-footer>
+                <button hlmAlertDialogCancel (click)="ctx.close()">{{ generatedToken() ? 'Close' : 'Cancel' }}</button>
+                @if (!generatedToken()) {
+                <button hlmAlertDialogAction (click)="onGenerate()" [disabled]="!tokenName || loading()">
+                    {{ loading() ? 'Generating...' : 'Generate Token' }}
+                </button>
+                }
+            </hlm-alert-dialog-footer>
+        </hlm-alert-dialog-content>
+    </ng-template>
+</hlm-alert-dialog>

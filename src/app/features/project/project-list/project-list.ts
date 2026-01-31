@@ -10,10 +10,9 @@ import { HlmInput } from '@spartan-ng/helm/input';
 import { lastValueFrom } from 'rxjs';
 import { NgIcon } from '@ng-icons/core';
 import { toast } from 'ngx-sonner';
-import { BrnAlertDialogContent, BrnAlertDialogTrigger } from '@spartan-ng/brain/alert-dialog';
-import { HlmAlertDialogImports } from '@spartan-ng/helm/alert-dialog';
 import { handleError } from '../../../utils/error-utils';
 import { ProjectService, type ProjectData } from '../services/project-api';
+import { DeleteProjectModal } from '../components/delete-project-modal/delete-project-modal';
 
 @Component({
     selector: 'app-project-list',
@@ -22,15 +21,11 @@ import { ProjectService, type ProjectData } from '../services/project-api';
         HlmButton,
         DatePipe,
         HlmCardImports,
-        HlmCardImports,
-        HlmInput,
         HlmInput,
         FormsModule,
         HlmIcon,
         NgIcon,
-        BrnAlertDialogTrigger,
-        BrnAlertDialogContent,
-        HlmAlertDialogImports,
+        DeleteProjectModal,
     ],
     templateUrl: './project-list.html',
 })
@@ -101,13 +96,4 @@ export class ProjectList implements OnInit {
         }
     }
 
-    async deleteProject(projectId: string) {
-        try {
-            await lastValueFrom(this.projectService.deleteProject(projectId));
-            toast.success('Project deleted successfully');
-            await this.fetchProjects();
-        } catch (err) {
-            handleError(err);
-        }
-    }
 }

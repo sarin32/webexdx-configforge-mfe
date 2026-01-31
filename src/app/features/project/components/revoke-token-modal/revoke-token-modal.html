@@ -1,0 +1,22 @@
+<hlm-alert-dialog>
+    <button brnAlertDialogTrigger hlmBtn [variant]="variant()" [size]="size()" [class]="triggerClass()"
+        (click)="$event.stopPropagation()">
+        <ng-content />
+    </button>
+    <ng-template brnAlertDialogContent let-ctx>
+        <hlm-alert-dialog-content>
+            <hlm-alert-dialog-header>
+                <h3 hlmAlertDialogTitle>Revoke Token</h3>
+                <p hlmAlertDialogDescription>
+                    Are you sure you want to revoke <strong>{{ tokenName() }}</strong>? This action cannot be undone.
+                </p>
+            </hlm-alert-dialog-header>
+            <hlm-alert-dialog-footer>
+                <button hlmAlertDialogCancel (click)="ctx.close()">Cancel</button>
+                <button hlmAlertDialogAction variant="destructive" (click)="onRevoke(ctx)">
+                    {{ loading() ? 'Revoking...' : 'Revoke Token' }}
+                </button>
+            </hlm-alert-dialog-footer>
+        </hlm-alert-dialog-content>
+    </ng-template>
+</hlm-alert-dialog>

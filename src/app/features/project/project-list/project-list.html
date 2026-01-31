@@ -46,27 +46,12 @@
                             <ng-icon hlm name="lucideEdit" class="h-4 w-4" />
                         </button>
 
-                        <hlm-alert-dialog>
-                            <button brnAlertDialogTrigger (click)="$event.stopPropagation()"
-                                class="p-1.5 hover:bg-muted rounded-md text-muted-foreground hover:text-red-500 transition-colors"
-                                title="Delete project">
-                                <ng-icon hlm name="lucideTrash2" class="h-4 w-4" />
-                            </button>
-                            <hlm-alert-dialog-content *brnAlertDialogContent="let ctx">
-                                <hlm-alert-dialog-header>
-                                    <h3 hlmAlertDialogTitle>Delete Project</h3>
-                                    <p hlmAlertDialogDescription>
-                                        Are you sure you want to delete <strong>{{ project.name }}</strong>? This action
-                                        will permanently remove all environments and variables.
-                                    </p>
-                                </hlm-alert-dialog-header>
-                                <hlm-alert-dialog-footer>
-                                    <button hlmBtn variant="ghost" (click)="ctx.close()">Cancel</button>
-                                    <button hlmBtn variant="destructive"
-                                        (click)="deleteProject(project.projectId); ctx.close()">Delete Project</button>
-                                </hlm-alert-dialog-footer>
-                            </hlm-alert-dialog-content>
-                        </hlm-alert-dialog>
+                        <app-delete-project-modal [projectId]="project.projectId" [projectName]="project.name"
+                            variant="ghost" size="icon"
+                            triggerClass="text-muted-foreground hover:text-red-500 transition-colors"
+                            (deleted)="fetchProjects()">
+                            <ng-icon hlm name="lucideTrash2" class="h-4 w-4" />
+                        </app-delete-project-modal>
                     </div>
                 </div>
                 } @else {

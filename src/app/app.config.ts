@@ -15,6 +15,8 @@ import {
   lucideSun,
   lucideTrash2,
   lucideX,
+  lucideKey,
+  lucideCopy,
 } from '@ng-icons/lucide';
 
 import { routes } from './app.routes';
@@ -35,6 +37,8 @@ export const appConfig: ApplicationConfig = {
       lucideX,
       lucidePlus,
       lucideChevronLeft,
+      lucideKey,
+      lucideCopy,
     }),
   ],
 };

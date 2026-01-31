@@ -1,19 +1,23 @@
 import { computed, Component, inject, Input, signal, type OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { lucideCheck, lucideChevronLeft, lucideEdit, lucidePlus, lucideTrash2, lucideX } from '@ng-icons/lucide';
+import { Router, RouterLink } from '@angular/router';
+import { lucideCheck, lucideChevronLeft, lucideEdit, lucidePlus, lucideTrash2, lucideX, lucideKey, lucideCopy } from '@ng-icons/lucide';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmIcon } from '@spartan-ng/helm/icon';
 import { HlmInput } from '@spartan-ng/helm/input';
 import { lastValueFrom } from 'rxjs';
 import { NgIcon } from '@ng-icons/core';
 import { toast } from 'ngx-sonner';
-import { BrnAlertDialogContent, BrnAlertDialogTrigger } from '@spartan-ng/brain/alert-dialog';
-import { HlmAlertDialogImports } from '@spartan-ng/helm/alert-dialog';
 import { handleError } from '../../../utils/error-utils';
 import { ProjectService, type GetProjectDataInDetailResult, type DetailedVariableData } from '../services/project-api';
 import { VariableApi } from '../services/variable-api';
 import { EnvironmentApi } from '../services/environment-api';
+import { type TokenData } from '../services/token-api';
+import { CreateEnvironmentModal } from '../components/create-environment-modal/create-environment-modal';
+import { AddKeyModal } from '../components/add-key-modal/add-key-modal';
+import { DeleteProjectModal } from '../components/delete-project-modal/delete-project-modal';
+import { DeleteEnvironmentModal } from '../components/delete-environment-modal/delete-environment-modal';
+import { RemoveVariableModal } from '../components/remove-variable-modal/remove-variable-modal';
 
 @Component({
     selector: 'app-project-detail',
@@ -24,9 +28,12 @@ import { EnvironmentApi } from '../services/environment-api';
         FormsModule,
         HlmIcon,
         NgIcon,
-        BrnAlertDialogTrigger,
-        BrnAlertDialogContent,
-        HlmAlertDialogImports,
+        RouterLink,
+        CreateEnvironmentModal,
+        AddKeyModal,
+        DeleteProjectModal,
+        DeleteEnvironmentModal,
+        RemoveVariableModal,
     ],
     templateUrl: './project-detail.html',
 })
@@ -79,14 +86,6 @@ export class ProjectDetail implements OnInit {
         return m;
     });
 
-    // For adding new environment
-    showCreateEnvironment = signal(false);
-    newEnvironmentName = '';
-
-    // For adding new variable row (key)
-    showAddKey = signal(false);
-    newKeyName = '';
-
     // Cell editing state
     editingCell = signal<{ key: string, envId: string } | null>(null);
     editingValue = '';
@@ -124,32 +123,6 @@ export class ProjectDetail implements OnInit {
         this.router.navigate(['/project']);
     }
 
-    async createEnvironment() {
-        if (!this.newEnvironmentName) return;
-
-        try {
-            await lastValueFrom(this.environmentApi.createEnvironment({
-                name: this.newEnvironmentName,
-                projectId: this.id
-            }));
-            toast.success('Environment created successfully');
-            this.newEnvironmentName = '';
-            this.showCreateEnvironment.set(false);
-            await this.fetchDetail(true);
-        } catch (err) {
-            handleError(err);
-        }
-    }
-
-    async deleteEnvironment(envId: string) {
-        try {
-            await lastValueFrom(this.environmentApi.deleteEnvironment(envId));
-            toast.success('Environment deleted successfully');
-            await this.fetchDetail(true);
-        } catch (err) {
-            handleError(err);
-        }
-    }
 
     // Project Actions
     startEditTitle() {
@@ -175,31 +148,12 @@ export class ProjectDetail implements OnInit {
         }
     }
 
-    async deleteProject() {
-        try {
-            await lastValueFrom(this.projectService.deleteProject(this.id));
-            toast.success('Project deleted successfully');
-            this.backToList();
-        } catch (err) {
-            handleError(err);
-        }
-    }
 
-    // Row (Key) management
-    toggleAddKey() {
-        if (!this.hasEnvironments()) return;
-        this.showAddKey.set(!this.showAddKey());
-        this.newKeyName = '';
-    }
-
-    async addKeyRow() {
-        if (!this.newKeyName) return;
-        const trimmed = this.newKeyName.trim();
-        if (trimmed && !this.allKeys().includes(trimmed)) {
-            this.extraKeys.update(keys => [...keys, trimmed]);
+    async onKeyAdded(key: string) {
+        if (key && !this.allKeys().includes(key)) {
+            this.extraKeys.update(keys => [...keys, key]);
+            toast.success(`Parameter "${key}" initialized`);
         }
-        this.newKeyName = '';
-        this.showAddKey.set(false);
     }
 
     // Cell management
@@ -238,13 +192,4 @@ export class ProjectDetail implements OnInit {
         }
     }
 
-    async deleteVariable(variableId: string) {
-        try {
-            await lastValueFrom(this.variableApi.deleteVariable(variableId));
-            toast.success('Variable override removed');
-            await this.fetchDetail(true);
-        } catch (err) {
-            handleError(err);
-        }
-    }
 }
