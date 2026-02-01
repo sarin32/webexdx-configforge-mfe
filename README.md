@@ -1,59 +1,71 @@
-# configforge
+# WebExDX ConfigForge MFE
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.11.
+An Angular-based Micro-Frontend (MFE) for configuration management in the WebExDX platform.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- **Configuration Management**: intuitive UI for managing system configurations.
+- **Modern UI**: built with Angular 20 and Spartan UI (Shadcn for Angular).
+- **Responsive Design**: styled using Tailwind CSS 4.
+- **State Management**: powered by RxJS signals and observables.
 
-```bash
-ng serve
-```
+## Tech Stack
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Framework**: Angular 20
+- **UI Architecture**: Spartan UI (@spartan-ng/brain)
+- **Styling**: Tailwind CSS 4, PostCSS
+- **Icons**: Ng-Icons (Lucide)
+- **Validation**: Biome
+- **Build Tool**: Angular CLI
 
-## Code scaffolding
+## Prerequisites
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- **Node.js**: >= 22
+- **Package Manager**: pnpm
 
-```bash
-ng generate component component-name
-```
+## Getting Started
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+### Installation
 
 ```bash
-ng build
+pnpm install
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Development
 
 ```bash
-ng test
+pnpm run start
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+### Build
 
 ```bash
-ng e2e
+pnpm run build:prod
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Available Scripts
 
-## Additional Resources
+- `pnpm run start`: Starts the development server on port 4002.
+- `pnpm run build:prod`: Creates a production build.
+- `pnpm run lint`: Checks code quality with Biome.
+- `pnpm run fix`: Fixes code issues with Biome.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Docker
+
+### Build
+
+```bash
+docker build -t webexdx-configforge-mfe --build-arg ENVIRONMENT=prod .
+```
+
+### Run
+
+```bash
+docker run -p 8081:80 webexdx-configforge-mfe
+```
+
+The application will be available at `http://localhost:8081`.
+
+## License
+
+Private
